@@ -1,2 +1,7 @@
 # AI-stuff
-Training examples, projects, ideas, etc.
+Collection of Machine Learning projects.
+- NSTBOT
+- ECOBOT
+- PyTorch Challenge Project
+- Transfer Learning
+- Convolutional Networks
