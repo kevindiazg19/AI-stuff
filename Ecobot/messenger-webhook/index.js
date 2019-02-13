@@ -37,12 +37,6 @@ app.post("/webhook", function (req, res) {
     if (req.body.object == "page") {
         // Si existe multiples entradas entraas
         req.body.entry.forEach(function(entry) {
-            // Iterara todos lo eventos capturados
-            //entry.messaging.forEach(function(event) { //Original ForEach
-                // if (event.message) {
-                    // process_event(event);
-                // }
-            // });
 			
 			//Obtiene mensaje.
 			//entry.messaging es array con un solo mensaje
@@ -58,7 +52,7 @@ app.post("/webhook", function (req, res) {
 			if (webhook_event.message) {
 				handleMessage(sender_psid, webhook_event.message);
 			} else if (webhook_event.postback){
-				handlePostback(sender_psid, webhook_event.postback)
+				handlePostback(sender_psid, webhook_event.postback);
 			}
         });
         res.sendStatus(200);
@@ -86,21 +80,21 @@ function handleMessage(sender_psid, received_message)
             let buttons = [
                 {
                     "type": "postback",
-                    "title": "Services",
-                    "payload": "servicios",
+                    "title": "Our Services",
+                    "payload": "services",
                 },
                 {
                     "type": "postback",
                     "title": "About Us",
-                    "payload": "quees",
+                    "payload": "aboutus",
                 },
                 {
                     "type": "postback",
-                    "title": "Open Positions",
-                    "payload": "trabajo",
+                    "title": "Careers",
+                    "payload": "careers",
                 }
             ];
-            response = CreateMenu("¡Hello! How can I help you?","Choose an option.", image, buttons)
+            response = CreateMenu("Hello! How can I help you?","Choose an option.",image, buttons);
         }
         else if(goodbye && goodbye.confidence > 0.8)
         {
@@ -110,9 +104,24 @@ function handleMessage(sender_psid, received_message)
         }
         else
         {
-            response = {
-                    "text": `Sorry I didn't get that: \n  "${received_message.text}".`
-            }
+            let buttons = [
+                {
+                    "type": "postback",
+                    "title": "Our Services",
+                    "payload": "services",
+                },
+                {
+                    "type": "postback",
+                    "title": "About Us",
+                    "payload": "aboutus",
+                },
+                {
+                    "type": "postback",
+                    "title": "Careers",
+                    "payload": "careers",
+                }
+            ];
+            response = CreateMenu(`Sorry I'm still learning and I didn't get that command: "${received_message.text}".`,"Choose an option so I can help you","", buttons);
         }
     }
     else if (received_message.attachments)
@@ -136,7 +145,7 @@ function handleMessage(sender_psid, received_message)
         let attachment_url = attachment.payload.url;
     }
     //manda el msj de respuesta
-    callSendAPI(sender_psid, response);
+    callSendAPI(sender_psid, response)
 }
 
 // Handles messaging_postbacks events
@@ -148,7 +157,7 @@ function handlePostback(sender_psid, received_postback)
     let payload = received_postback.payload;
 
     //responder de acuerdo al postback
-    if (payload === 'trabajo')
+    if (payload === 'careers')
     {        
         let buttons = [
             {
@@ -167,27 +176,61 @@ function handlePostback(sender_psid, received_postback)
                 "payload": "trabajo.2",
             }
         ];
-        response = CreateMenu("Open Positions", "Choose an option", "",buttons);
+        response = CreateMenu("Open Positions", "Choose an option","",buttons);
         // response = { "text": "Estas son nuestras vacanes:\n Si te interesó alguna, arrastra tu CV a la conversación y nos pondrémos en contacto"}
     }
-    else if (payload === 'servicios')
+    else if (payload === 'services')
     {
-        response = { 
-            "text": "*Team Enhacement:* Some inspiring text"
-        }
+        let data = [
+            {
+                "title":"Team Enhancement",
+                "subtitle":"We provide customers with skilled, conscientious and motivated professionals. ",
+                "image_url":"https://s3-us-west-2.amazonaws.com/cdn.nearshoretechnology.com/NS_site/Images/Culture/Services_Images_1.png"
+            },
+            {
+                "title":"Software Development",
+                "subtitle":"In every engagement, we align our solution to your needs to help you achieve your product and cost goals.",
+                "image_url":"https://s3-us-west-2.amazonaws.com/cdn.nearshoretechnology.com/NS_site/Images/Culture/Services_Images_2.png"
+            },
+            {
+                "title":"Managed Services",
+                "subtitle":"Our NSRS model is highly efficient and provides you with not only a higher quantity of work, but also a higher quality of work performed when compared to the offshore model.",
+                "image_url":"https://s3-us-west-2.amazonaws.com/cdn.nearshoretechnology.com/NS_site/Images/Culture/Services_Images_3.png"
+            }
+        ];
+        response = listMenu(data);
+        // callSendAPI(sender_psid, response2)
+        // let buttons = [
+        //     {
+        //         "type": "postback",
+        //         "title": "About Us",
+        //         "payload": "aboutus",
+        //     },
+        //     {
+        //         "type": "postback",
+        //         "title": "Careers",
+        //         "payload": "careers",
+        //     }
+        // ];
+        // response = CreateMenu("Do you want to know more about NST?", "Choose an option","",buttons);
+        
     }
-    else if (payload === 'quees')
+    else if (payload === 'aboutus')
     {
-        response = { "text": "More inspiring text"
-        }
+        response = { "text": "More inspiring text" }
     }
-    else if(payload.indexOf('trabajo.') > -1 )
+    /*else if(payload === 'more1')
+    {
+        response = { "text":"Another menu for later maybe"}
+    }*/
+    else if(payload.indexOf('careers.') > -1 )
     {
         let iVac = payload.split('.');
         response = { "text": "Open Position:"+iVac[1] + 
             ". If you're intersted on this open position attach your resume to this conversation, write your phone and email and we'll contact you to start the process."
         }
     }
+    
     //envair el msj
     callSendAPI(sender_psid, response);
 }
@@ -223,7 +266,7 @@ function firstEntity(nlp, name)
     return nlp && nlp.entities && nlp.entities[name] && nlp.entities[name][0];
 }
 
-function CreateMenu(title, subtitle, image, buttons)
+function CreateMenu(title, subtitle, image,buttons)
 {
     let response = {
         "attachment": {
@@ -254,6 +297,41 @@ function CreateMenu(title, subtitle, image, buttons)
     return response;
 }
 
+function listMenu(data)
+{
+    let response = 
+    {
+        "attachment": 
+        {
+            "type": "template",
+            "payload": 
+            {
+                "template_type": "list",
+                "top_element_style": "compact",
+                "buttons" : [
+                    {
+                    "title" : "View More",
+                    "type" : "web_url",
+                    "url": "https://www.nearshoretechnology.com/services"
+                    }
+                ]
+            }
+        }
+    }
+    if (data != null && data.length > 0)
+    {
+        response.attachment.payload.elements = [];
+        data.forEach(function (value) {
+            let dta = {};
+            //dta.type = value.type;
+            dta.title = value.title;
+            dta.subtitle=value.subtitle;
+            dta.image_url = value.image_url;
+            response.attachment.payload.elements.push(dta);
+        });
+    }
+    return response;
+}
 
 // // Funcion donde se procesara el evento
 // function process_event(event){
