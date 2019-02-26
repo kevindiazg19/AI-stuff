@@ -185,34 +185,26 @@ function handlePostback(sender_psid, received_postback)
             {
                 "title":"Team Enhancement",
                 "subtitle":"We provide customers with skilled, conscientious and motivated professionals. ",
-                "image_url":"https://s3-us-west-2.amazonaws.com/cdn.nearshoretechnology.com/NS_site/Images/Culture/Services_Images_1.png"
+                "image_url":"https://s3-us-west-2.amazonaws.com/cdn.nearshoretechnology.com/NS_site/Images/Culture/Services_Images_1.png",
+                "main_url": "teamenhancement",
+                "btn_type":"postback"
             },
             {
                 "title":"Software Development",
                 "subtitle":"In every engagement, we align our solution to your needs to help you achieve your product and cost goals.",
-                "image_url":"https://s3-us-west-2.amazonaws.com/cdn.nearshoretechnology.com/NS_site/Images/Culture/Services_Images_2.png"
+                "image_url":"https://s3-us-west-2.amazonaws.com/cdn.nearshoretechnology.com/NS_site/Images/Culture/Services_Images_2.png",
+                "main_url":  "https://www.nearshoretechnology.com/services/development",
+                "btn_type" : "web_url"
             },
             {
                 "title":"Managed Services",
                 "subtitle":"Our NSRS model is highly efficient and provides you with not only a higher quantity of work, but also a higher quality of work performed when compared to the offshore model.",
-                "image_url":"https://s3-us-west-2.amazonaws.com/cdn.nearshoretechnology.com/NS_site/Images/Culture/Services_Images_3.png"
+                "image_url":"https://s3-us-west-2.amazonaws.com/cdn.nearshoretechnology.com/NS_site/Images/Culture/Services_Images_3.png",
+                "main_url": "https://www.nearshoretechnology.com/services/managed-services",
+                "btn_type" : "web_url"
             }
         ];
         response = listMenu(data);
-        // callSendAPI(sender_psid, response2)
-        // let buttons = [
-        //     {
-        //         "type": "postback",
-        //         "title": "About Us",
-        //         "payload": "aboutus",
-        //     },
-        //     {
-        //         "type": "postback",
-        //         "title": "Careers",
-        //         "payload": "careers",
-        //     }
-        // ];
-        // response = CreateMenu("Do you want to know more about NST?", "Choose an option","",buttons);
         
     }
     else if (payload === 'aboutus')
@@ -230,7 +222,70 @@ function handlePostback(sender_psid, received_postback)
             ". If you're intersted on this open position attach your resume to this conversation, write your phone and email and we'll contact you to start the process."
         }
     }
-    
+    else if (payload === 'teamenhancement'){
+
+        let data = [
+            {
+                "title":"Our Services include",
+                "subtitle":"Architecture & System Engineering, Custom Dev and Integration Services ",
+                "image_url":"https://i.imgur.com/6D9CaT6.png",
+                "main_url": "serviceinclude",
+                "btn_type":"postback"
+            },
+            {
+                "title":"Capabilities",
+                "subtitle":"Microsoft and Oracle Technologies, Project Managemnet and Support/Maintenance",
+                "image_url":"https://i.imgur.com/BzfBqL8.png",
+                "main_url":  "https://www.nearshoretechnology.com/services/development",
+                "btn_type" : "web_url"
+            },
+            {
+                "title":"Benefits",
+                "subtitle":"Communication is easy, Flexible resources, Travel to US client sites, Cost Control",
+                "image_url":"https://i.imgur.com/J8cBcMd.png",
+                "main_url": "https://www.nearshoretechnology.com/services/managed-services",
+                "btn_type" : "web_url"
+            }"btn_type" : "web_url"
+            }
+        ];
+        response = listMenu(data);
+        //response = { "text": "Here could be some other list menu or stuff" }
+    }
+    else if (payload === 'serviceinclude'){
+        let data = [
+            {
+                "title":"Architecture & System Engineering",
+                "subtitle":"We provide the people, best practices, and insight required to build a variety of IT blueprints—viable, detailed plans that will stand the test of time.",
+                "image_url":"https://i.imgur.com/9qrk5XC.png",
+                "main_url": "t1",
+                "btn_type":"postback"
+            },
+            {
+                "title":"Custom Development",
+                "subtitle":"When you need an application customized to your specific business needs, we have the experts to deliver.",
+                "image_url":"https://i.imgur.com/fvdUrK8.png",
+                "main_url":  "t2",
+                "btn_type" : "postback"
+            },
+            {
+                "title":"Integration Services",
+                "subtitle":"We understand the process of linking systems to act as a whole when data and systems need to come together in a seamless manner",
+                "image_url":"https://i.imgur.com/APX3tsR.png",
+                "main_url": "t3",
+                "btn_type" : "postback"
+            }
+        ];
+        response = listMenu(data);
+    }
+    else if (payload === 't1'){
+        response = { "text": "More regarding Architecture, maybe" }
+    }
+    else if (payload === 't2'){
+        response = { "text": "More regarding custom Development, maybe" }
+    }
+    else if (payload === 't3'){
+        response = { "text": "More regarding Integration Services, maybe" }
+    }
     //envair el msj
     callSendAPI(sender_psid, response);
 }
@@ -307,7 +362,7 @@ function listMenu(data)
             "payload": 
             {
                 "template_type": "list",
-                "top_element_style": "compact",
+                "top_element_style":"compact",
                 "buttons" : [
                     {
                     "title" : "View More",
@@ -318,18 +373,48 @@ function listMenu(data)
             }
         }
     }
+
     if (data != null && data.length > 0)
     {
         response.attachment.payload.elements = [];
+        //iterate through each section of menu
         data.forEach(function (value) {
+            //define main sections, tite, subtitile and image url
             let dta = {};
-            //dta.type = value.type;
             dta.title = value.title;
             dta.subtitle=value.subtitle;
             dta.image_url = value.image_url;
+            //default action section, for click on element
+            // dta.default_action = {};
+            // dta.default_action.type = "web_url";
+            // dta.default_action.url = value.main_url;
+            // dta.default_action.messenger_extensions = true;
+            // dta.default_action.webview_height_ratio = "tall";
+            // dta.default_action.fallback_url = "https://www.nearshoretechnology.com/services";
+            //main button section
+            dta.buttons = [];
+            //buttons section, elements for button shown on each card
+            let btn = {};
+            btn.title = "More...";
+            btn.type = value.btn_type;// can be postback or web_url
+            if (btn.type === "web_url"){
+                btn.url = value.main_url; //creates url object
+                btn.messenger_extensions = false;
+                btn.webview_height_ratio = "tall";
+            } else{ //if payload
+                btn.payload = value.main_url //creates payload object
+            }
+            
+            //btn.fallback_url = "https://www.nearshoretechnology.com/services";
+            //I push these elements to main button section
+            dta.buttons.push(btn)
+            //enviar componentes de elementos
             response.attachment.payload.elements.push(dta);
         });
     }
+    //debug: muestra elements en su formato actual
+    //console.log('response.attachment.payload.elements:');
+    //console.dir(response.attachment.payload.elements)
     return response;
 }
 
