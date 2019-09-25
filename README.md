@@ -1,5 +1,5 @@
 # AI-stuff
-Collection of Machine Learning projects.
+Collection of self study Machine Learning projects.
 - NSTBOT
 - ECOBOT
 - PyTorch Challenge Project
